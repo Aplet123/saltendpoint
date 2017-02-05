@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.14.1",
     "ftp": "^0.3.10",
+    "pug": "^2.0.0-beta11",
     "request": "^2.79.0"
   },
   "devDependencies": {
