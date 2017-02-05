@@ -30,7 +30,7 @@ app.get('/', function(request, response) {
 
 for (let dir of fs.readdirSync("api")) {
     require("./" + path.join("api", dir, "index.js")).init(app, bot, {
-        BASE: process.env[dir.toUpperCase() + "BASE"],
+        BASE: process.env[dir.toUpperCase() + "BASE"] || "/api/" + dir + "/",
         PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined
     });
 }
