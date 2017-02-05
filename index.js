@@ -2,10 +2,16 @@ var express = require('express');
 var app = express();
 var fs = require("fs");
 var path = require("path");
+var Discord = require("discord.js");
+var bot = new Discord.Client({
+    fetchAllMembers: true
+});
 
-if(process.env.DEPLOYED === undefined) {
+if(!process.env.DEPLOYED) {
     require("dotenv").config();
 }
+
+bot.login(process.env.TOKEN);
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -23,8 +29,9 @@ app.get('/', function(request, response) {
 });
 
 for (let dir of fs.readdirSync("api")) {
-    require("./" + path.join("api", dir, "index.js")).init(app, {
-        BASE: process.env[dir.toUpperCase() + "BASE"]
+    require("./" + path.join("api", dir, "index.js")).init(app, bot, {
+        BASE: process.env[dir.toUpperCase() + "BASE"],
+        PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined
     });
 }
 
