@@ -6,17 +6,13 @@ module.exports = {
             res.end(req.params.value);
         });
         app.get(base + "users/:id", function(req, res) {
-            if (req.query.password !== passwords[2]) {
-                res.status(401).end(new Error("Incorrect password").stack);
+            var user = bot.users.get(req.params.id);
+            if (user) {
+                res.end(JSON.stringify({
+                    username: user.username
+                }));
             } else {
-                var user = bot.users.get(req.params.id);
-                if (user) {
-                    res.end(JSON.stringify({
-                        username: user.username
-                    }));
-                } else {
-                    res.status(403).end(new Error("User not found").stack);
-                }
+                res.status(403).end(new Error("User not found").stack);
             }
         });
     }
