@@ -9,7 +9,10 @@ module.exports = {
             var user = bot.users.get(req.params.id);
             if (user) {
                 res.end(JSON.stringify({
-                    username: user.username
+                    username: user.username,
+                    discriminator: user.discriminator,
+                    avatar: user.displayAvatarURL,
+                    id: user.id
                 }));
             } else {
                 res.status(403).end(new Error("User not found").stack);
