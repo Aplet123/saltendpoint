@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+var fs = require("fs");
+var path = require("path");
 
 if(process.env.DEPLOYED === undefined) {
     require("dotenv").config();
@@ -19,6 +21,12 @@ app.get('/', function(request, response) {
       favicon: process.env.FAVICON || "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Salt_shaker_on_white_background.jpg/220px-Salt_shaker_on_white_background.jpg"
   });
 });
+
+for (let dir of fs.readdirSync("api")) {
+    require("./" + path.join("api", dir, "index.js")).init(app, {
+        BASE: process.env[dir.toUpperCase() + "BASE"]
+    });
+}
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
