@@ -9,7 +9,14 @@
   "scripts": {
     "start": "node index.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.14.1",
+    "ftp": "^0.3.10",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "dotenv": "^4.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Aplet123/saltendpoint"
