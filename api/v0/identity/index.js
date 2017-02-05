@@ -12,5 +12,8 @@ module.exports = {
                 });
             }
         }
+        app.get(base + ":value", function(req, res) {
+            res.end(req.params.value);
+        });
     }
 };

@@ -12,5 +12,12 @@ module.exports = {
                 });
             }
         }
+        app.get(base, function(req, res) {
+            if(Number(req.query.timestamp)) {
+                res.end(String(Date.now() - Number(req.query.timestamp)));
+            } else {
+                res.sendStatus(400);
+            }
+        });
     }
 };
