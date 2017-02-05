@@ -7,7 +7,7 @@ var bot = new Discord.Client({
     fetchAllMembers: true
 });
 
-if(process.env.DEPLOYED === undefined) {
+if(!process.env.DEPLOYED) {
     require("dotenv").config();
 }
 
