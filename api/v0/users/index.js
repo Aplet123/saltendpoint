@@ -16,13 +16,13 @@ module.exports = {
         app.get(base + ":id", function(req, res) {
             var user = bot.users.get(req.params.id);
             if (user) {
-                res.end(JSON.stringify({
+                res.json({
                     username: user.username,
                     discriminator: user.discriminator,
                     avatar: user.displayAvatarURL,
                     id: user.id,
                     bot: user.bot
-                }));
+                });
             } else {
                 res.sendStatus(403);
             }
