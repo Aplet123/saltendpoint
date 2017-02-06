@@ -8,7 +8,8 @@ module.exports = {
             if(!/^.+\.js$/i.test(dir)) {
                 require(path.join(__dirname, dir, "index.js")).init(app, bot, ftp, {
                     BASE: base + dir + "/",
-                    PASSWORDS: passwords
+                    PASSWORDS: passwords,
+                    MISC: config.MISC
                 });
             }
         }

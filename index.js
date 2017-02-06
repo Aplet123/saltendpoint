@@ -5,6 +5,7 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var ftpClient = new ftp();
+var auth = {};
 var bot = new Discord.Client({
     fetchAllMembers: true
 });
@@ -41,7 +42,10 @@ for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
     if(!/^.+\.js$/i.test(dir)) {
         require(path.join(__dirname, "api", dir, "index.js")).init(app, bot, ftpClient, {
             BASE: process.env[dir.toUpperCase() + "BASE"] || "/api/" + dir + "/",
-            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined
+            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined,
+            MISC: {
+                AUTH: auth
+            }
         });
     }
 }

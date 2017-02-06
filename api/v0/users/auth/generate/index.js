@@ -15,18 +15,24 @@ module.exports = {
         }
         app.get(base + ":id", function(req, res) {
             if(req.query.password !== passwords[2]) {
-                res.status(403).end(new Error("Incorrect password").stack);
+                res.sendStatus(401);
             } else {
+                var _ = require("lodash");
+                var tokenMe = v => _.times(50, v => _.sample("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")).join``;
                 var user = bot.users.get(req.params.id);
                 if (user) {
-                    user.sendMessage("DARUDE SANDSTROM").then(v => {
-                        res.end("Sent");
-                    }).catch(err => {
-                        console.error(err.message);
-                        res.status(403).end(new Error("Message cannot be sent").stack);
+                    var token = tokenMe();
+                    ftp.get("/endpoint/auth.json", false, function (err, stream) {
+                        if (err) {
+                            res.sendStatus(500);
+                        } else {
+                            stream.on("data", json => {
+                                var data = JSON.parse(json);
+                            });
+                        }
                     });
                 } else {
-                    res.status(403).end(new Error("User not found").stack);
+                    res.sendStatus(400);
                 }
             }
         });
