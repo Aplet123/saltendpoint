@@ -7,7 +7,7 @@ module.exports = {
         for (let dir of fs.readdirSync(__dirname)) {
             if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
                 require(path.join(__dirname, dir, "index.js")).init(app, bot, ftp, {
-                    BASE: base + dir.replace(/\.folder\.js$/i, ".js") + "/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : ""),
+                    BASE: base + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/",
                     PASSWORDS: passwords,
                     MISC: config.MISC
                 });
