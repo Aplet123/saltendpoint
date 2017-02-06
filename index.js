@@ -39,10 +39,10 @@ app.get('/', function(request, response) {
 });
 
 for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
-    if(!/^.+\.js$/i.test(dir)) {
+    if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
         require(path.join(__dirname, "api", dir, "index.js")).init(app, bot, ftpClient, {
-            BASE: process.env[dir.toUpperCase() + "BASE"] || "/api/" + dir + "/",
-            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined,
+            BASE: process.env[dir.toUpperCase() + "BASE"] || "/api/" + dir.replace(/\.folder\.js$/i, ".js") + "/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : ""),
+            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"],
             MISC: {
                 AUTH: auth
             }
@@ -51,10 +51,10 @@ for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
 }
 
 for (let dir of fs.readdirSync(path.join(__dirname, "pages"))) {
-    if(!/^.+\.js$/i.test(dir)) {
+    if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
         require(path.join(__dirname, "pages", dir, "index.js")).init(app, bot, ftpClient, {
-            BASE: process.env[dir.toUpperCase() + "BASE"] || "/pages/" + dir + "/",
-            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined,
+            BASE: process.env["PAGES" + dir.toUpperCase() + "BASE"] || ( "/pages/" + dir.replace(/\.folder\.js$/i, ".js") + "/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "")),
+            PASSWORDS: process.env["PAGES" + dir.toUpperCase() + "PASSWORDS"],
             MISC: {
                 AUTH: auth
             }

@@ -5,14 +5,15 @@ module.exports = {
         var path = require("path");
         var fs = require("fs");
         for (let dir of fs.readdirSync(__dirname)) {
-            if(!/^.+\.js$/i.test(dir)) {
+            if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
                 require(path.join(__dirname, dir, "index.js")).init(app, bot, ftp, {
-                    BASE: base + dir + "/",
+                    BASE: base + dir.replace(/\.folder\.js$/i, ".js") + "/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : ""),
                     PASSWORDS: passwords,
                     MISC: config.MISC
                 });
             }
         }
+        console.log(base);
         app.get(base + ":id", function(req, res) {
             if(req.query.password !== passwords[2]) {
                 res.sendStatus(401);

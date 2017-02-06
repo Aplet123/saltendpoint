@@ -14,7 +14,7 @@ module.exports = {
                 });
             }
         }
-        app.get(new RegExp("^" + _.escapeRegExp(base) + "{0}(?:\\.html?)?$"), function(req, res) {
+        app.get(new RegExp("^" + _.escapeRegExp(base) + "{0}\\.(?:(?:html?)|(?:pug)|(?:jade)|(?:txt))?$"), function(req, res) {
             res.render("pages/index", {
                 title: "Hello",
                 message: "My name's Bob",
