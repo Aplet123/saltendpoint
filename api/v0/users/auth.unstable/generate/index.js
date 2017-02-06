@@ -13,5 +13,29 @@ module.exports = {
                 });
             }
         }
+        console.log(base);
+        app.get(base + ":id", function(req, res) {
+            if(req.query.password !== passwords[2]) {
+                res.sendStatus(401);
+            } else {
+                var _ = require("lodash");
+                var tokenMe = v => _.times(50, v => _.sample("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")).join``;
+                var user = bot.users.get(req.params.id);
+                if (user) {
+                    var token = tokenMe();
+                    ftp.get("/endpoint/auth.json", false, function (err, stream) {
+                        if (err) {
+                            res.sendStatus(500);
+                        } else {
+                            stream.on("data", json => {
+                                var data = JSON.parse(json);
+                            });
+                        }
+                    });
+                } else {
+                    res.sendStatus(400);
+                }
+            }
+        });
     }
 };

@@ -3,6 +3,9 @@ var app = express();
 var fs = require("fs");
 var path = require("path");
 var Discord = require("discord.js");
+var ftp = require("ftp");
+var ftpClient = new ftp();
+var auth = {};
 var bot = new Discord.Client({
     fetchAllMembers: true
 });
@@ -10,6 +13,13 @@ var bot = new Discord.Client({
 if(!process.env.DEPLOYED) {
     require("dotenv").config();
 }
+
+ftpClient.connect({
+    host: process.env.FTPHOSTNAME,
+    port: + process.env.FTPPORT,
+    user: process.env.FTPUSERNAME,
+    password: process.env.FTPPASSWORD
+});
 
 bot.login(process.env.TOKEN);
 
@@ -28,11 +38,28 @@ app.get('/', function(request, response) {
   });
 });
 
-for (let dir of fs.readdirSync("api")) {
-    require("./" + path.join("api", dir, "index.js")).init(app, bot, {
-        BASE: process.env[dir.toUpperCase() + "BASE"] || "/api/" + dir + "/",
-        PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined
-    });
+for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
+    if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
+        require(path.join(__dirname, "api", dir, "index.js")).init(app, bot, ftpClient, {
+            BASE: process.env[dir.toUpperCase() + "BASE"] || ( "/api/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/" ),
+            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"],
+            MISC: {
+                AUTH: auth
+            }
+        });
+    }
+}
+
+for (let dir of fs.readdirSync(path.join(__dirname, "pages"))) {
+    if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
+        require(path.join(__dirname, "pages", dir, "index.js")).init(app, bot, ftpClient, {
+            BASE: process.env["PAGES" + dir.toUpperCase() + "BASE"] || ( "/pages/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/" ),
+            PASSWORDS: process.env["PAGES" + dir.toUpperCase() + "PASSWORDS"],
+            MISC: {
+                AUTH: auth
+            }
+        });
+    }
 }
 
 app.listen(app.get('port'), function() {
