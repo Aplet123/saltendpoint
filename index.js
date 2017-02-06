@@ -50,6 +50,18 @@ for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
     }
 }
 
+for (let dir of fs.readdirSync(path.join(__dirname, "pages"))) {
+    if(!/^.+\.js$/i.test(dir)) {
+        require(path.join(__dirname, "pages", dir, "index.js")).init(app, bot, ftpClient, {
+            BASE: process.env[dir.toUpperCase() + "BASE"] || "/pages/" + dir + "/",
+            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"] ? process.env[dir.toUpperCase() + "PASSWORDS"].split`,` : undefined,
+            MISC: {
+                AUTH: auth
+            }
+        });
+    }
+}
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
