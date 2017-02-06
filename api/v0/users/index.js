@@ -24,7 +24,7 @@ module.exports = {
                     bot: user.bot
                 }));
             } else {
-                res.sendStatus(400);
+                res.sendStatus(403);
             }
         });
     }

@@ -13,8 +13,12 @@ module.exports = {
                 });
             }
         }
-        app.get(base + ":value", function(req, res) {
-            res.end(req.params.value);
+        app.get(base, function(req, res) {
+            if (req.query.value) {
+                res.end(req.query.value);
+            } else {
+                res.sendStatus(400);
+            }
         });
     }
 };
