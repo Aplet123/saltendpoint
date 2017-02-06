@@ -13,7 +13,6 @@ module.exports = {
                 });
             }
         }
-        console.log(base);
         app.get(base + ":id", function(req, res) {
             if(req.query.password !== passwords[2]) {
                 res.sendStatus(401);
@@ -33,7 +32,7 @@ module.exports = {
                         }
                     });
                 } else {
-                    res.sendStatus(400);
+                    res.sendStatus(403);
                 }
             }
         });

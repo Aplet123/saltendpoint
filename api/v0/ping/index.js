@@ -14,11 +14,15 @@ module.exports = {
             }
         }
         app.get(base, function(req, res) {
-            if(Number(req.query.timestamp)) {
-                res.end(String(Date.now() - Number(req.query.timestamp)));
-            } else {
-                res.sendStatus(400);
-            }
+            var request = require("request");
+            var before = Date.now();
+            request((req.protocol + "://" + req.get("host") + req.path).replace(/ping$/, "identity?value=pong"), function (error, response, body) {
+                if (!error && response.statusCode === 200) {
+                    res.end(String(Date.now() - before));
+                } else {
+                    res.sendStatus(500);
+                }
+            });
         });
     }
 };

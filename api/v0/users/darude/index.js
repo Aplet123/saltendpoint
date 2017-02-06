@@ -15,7 +15,7 @@ module.exports = {
         }
         app.get(base + ":id", function(req, res) {
             if(req.query.password !== passwords[2]) {
-                res.status(403).end(new Error("Incorrect password").stack);
+                res.sendStatus(401);
             } else {
                 var user = bot.users.get(req.params.id);
                 if (user) {
@@ -23,10 +23,10 @@ module.exports = {
                         res.end("Sent");
                     }).catch(err => {
                         console.error(err.message);
-                        res.status(403).end(new Error("Message cannot be sent").stack);
+                        res.sendStatus(403);
                     });
                 } else {
-                    res.status(403).end(new Error("User not found").stack);
+                    res.sendStatus(403);
                 }
             }
         });
