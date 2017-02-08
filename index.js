@@ -18,7 +18,7 @@ if(! process.env.DEPLOYED) {
     require("dotenv").config();
 } else {
     bot.on("message", function(message) {
-        if (/^&&&&&HALP$/.test(message.content)) {
+        if (/^<=>HALP$/.test(message.content)) {
             message.author.sendMessage("no");
         }
     });
