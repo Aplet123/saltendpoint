@@ -4,6 +4,8 @@ var fs = require("fs");
 var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
+var _ = require("lodash");
+const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
 var bot = new Discord.Client({
@@ -18,7 +20,16 @@ if(! process.env.DEPLOYED) {
     require("dotenv").config();
 } else {
     bot.on("message", function(message) {
-        if (/^&&&&&HALP$/.test(message.content)) {
+        const prefix = "<=>";
+        var instruction;
+        if (message.author.bot) {
+            return;
+        }
+        if (! (new RegExp("^"+ _.escapeRegExp(prefix) + "[^]+", "i")).test(message.content)) {
+            return;
+        }
+        instruction = message.content.slice(prefix.length);
+        if (/^halp$/i.test(instruction)) {
             message.author.sendMessage("no");
         }
     });
