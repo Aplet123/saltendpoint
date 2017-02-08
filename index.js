@@ -10,8 +10,18 @@ var bot = new Discord.Client({
     fetchAllMembers: true
 });
 
-if(!process.env.DEPLOYED) {
+bot.on("ready", function() {
+    console.log(`Woot signed in as ${bot.user.username}#${bot.user.discriminator} (ID: ${bot.user.id})!`);
+});
+
+if(! process.env.DEPLOYED) {
     require("dotenv").config();
+} else {
+    bot.on("message", function(message) {
+        if (/^&&&&&HALP$/.test(message.content)) {
+            message.author.sendMessage("no");
+        }
+    });
 }
 
 ftpClient.connect({
@@ -63,5 +73,5 @@ for (let dir of fs.readdirSync(path.join(__dirname, "pages"))) {
 }
 
 app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
+  console.log(`Yo yo yo wazzup iz ya boi ${app.get("port")} which is pretty dank!`);
 });
