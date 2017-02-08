@@ -56,24 +56,25 @@ module.exports = {
                 try {
                     if(!/^[0-9a-fA-F]{1,8}$/.test(req.params.hex) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || Number(req.params.width) % 1 || Number(req.params.height) % 1) {
                         res.sendStatus(400);
+                    } else {
+                        new JIMP(Number(req.params.width), Number(req.params.height), parseInt(req.params.hex, 16), function(error, canvas) {
+                            if (error) {
+                                res.sendStatus(500);
+                            } else {
+                                canvas.getBuffer("image/png", function(error, buffer) {
+                                    if (error) {
+                                        res.sendStatus(500);
+                                    } else {
+                                        res.set({
+                                            "Content-Type": "image/png",
+                                            "Accept": "image/png"
+                                        });
+                                        res.end(buffer);
+                                    }
+                                });
+                            }
+                        });
                     }
-                    new JIMP(Number(req.params.width), Number(req.params.height), parseInt(req.params.hex, 16), function(error, canvas) {
-                        if (error) {
-                            res.sendStatus(500);
-                        } else {
-                            canvas.getBuffer("image/png", function(error, buffer) {
-                                if (error) {
-                                    res.sendStatus(500);
-                                } else {
-                                    res.set({
-                                        "Content-Type": "image/png",
-                                        "Accept": "image/png"
-                                    });
-                                    res.end(buffer);
-                                }
-                            });
-                        }
-                    });
                 } catch (err) {
                     res.sendStatus(403);
                 }
