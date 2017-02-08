@@ -17,8 +17,8 @@ module.exports = {
         app.get(new RegExp("^" + _.escapeRegExp(base) + "{0}\\.?(?:(?:html?)|(?:pug)|(?:jade)|(?:txt))?$"), function(req, res) {
             res.render("pages/index", {
                 title: "Hey there",
-                message: "Hi Skippy how are you (the answer is crazy and you need help)",
-                favicon: "https://cdn.discordapp.com/avatars/199186725354864640/23509529b30b9fa6c6aae9c18aca06d3.jpg?size=1024"
+                message: "Template strings go",
+                favicon: "https://images-ext-2.discordapp.net/eyJ1cmwiOiJodHRwczovL2RldmVsb3Blci5jZG4ubW96aWxsYS5uZXQvc3RhdGljL2ltZy9mYXZpY29uMzIuZTAyODU0ZmRjZjczLnBuZyJ9.M0PHiG0LQnIS30yGyrDsnDmJcYw"
             });
         });
     }

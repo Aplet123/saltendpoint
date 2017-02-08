@@ -6,15 +6,15 @@ module.exports = {
         var fs = require("fs");
         var _ = require("lodash");
         for (let dir of fs.readdirSync(__dirname)) {
-            if(!/^.+\.js$/i.test(dir)) {
+            if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
                 require(path.join(__dirname, dir, "index.js")).init(app, bot, ftp, {
-                    BASE: base + dir + "/",
+                    BASE: base + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/",
                     PASSWORDS: passwords,
                     MISC: config.MISC
                 });
             }
         }
-        app.get(new RegExp("^" + _.escapeRegExp(base) + "{0}\\.(?:(?:html?)|(?:pug)|(?:jade)|(?:txt))?$"), function(req, res) {
+        app.get(new RegExp("^" + _.escapeRegExp(base) + "{0}\\.?(?:(?:html?)|(?:pug)|(?:jade)|(?:txt))?$"), function(req, res) {
             res.render("pages/index", {
                 title: "Hello",
                 message: "My name's Bob",
