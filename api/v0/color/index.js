@@ -20,7 +20,7 @@ module.exports = {
             if (Storage.fromObject(req.params).every(v => ! isNaN(Number(v)))) {
                 try {
                     var values = ["red", "green", "blue", "opacity"].map(v => Number(req.params[v]));
-                    if(values.some(v => v > 255 || v < 0 || ! (v % 1)) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || Number(req.params.width) % 1 || ! Number(req.params.height) % 1) {
+                    if(values.some(v => v > 255 || v < 0 || v % 1) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || Number(req.params.width) % 1 || Number(req.params.height) % 1) {
                         res.sendStatus(400);
                     } else {
                         var color;
