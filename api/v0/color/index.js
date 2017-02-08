@@ -20,13 +20,13 @@ module.exports = {
             if (Storage.fromObject(req.params).every(v => ! isNaN(Number(v)))) {
                 try {
                     var values = ["red", "green", "blue", "opacity"].map(v => Number(req.params[v]));
-                    if(values.some(v => v > 255 || v < 0 || ! (v % 1)) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || ! (Number(req.params.width) % 1) || ! (Number(req.params.height) % 1)) {
+                    if(values.some(v => v > 255 || v < 0 || ! (v % 1)) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || Number(req.params.width) % 1 || ! Number(req.params.height) % 1) {
                         res.sendStatus(400);
                     } else {
                         var color;
                         values = values.map(v => v.toString(16));
                         color = values.map(v => _.padStart(v, 2, "0")).join``;
-                        var img = new JIMP(Number(req.params.width), Number(req.params.height), parseInt(color, 16), function(error, canvas) {
+                        new JIMP(Number(req.params.width), Number(req.params.height), parseInt(color, 16), function(error, canvas) {
                             if (error) {
                                 res.sendStatus(500);
                             } else {
@@ -54,10 +54,10 @@ module.exports = {
         app.get(base + ":hex-:width-:height", function(req, res) {
             if (["hex", "width", "height"].map(v => req.params[v]).every((v, i) => i ? !isNaN(Number(v)) : !isNaN(parseInt(v, 16)))) {
                 try {
-                    if(!/^[0-9a-fA-F]{1,8}$/.test(req.params.hex) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || ! (Number(req.params.width) % 1) || ! (Number(req.params.height) % 1)) {
+                    if(!/^[0-9a-fA-F]{1,8}$/.test(req.params.hex) || Number(req.params.width) < 0 || Number(req.params.height) < 0 || Number(req.params.width) % 1 || Number(req.params.height) % 1) {
                         res.sendStatus(400);
                     }
-                    var img = new JIMP(Number(req.params.width), Number(req.params.height), parseInt(req.params.hex, 16), function(error, canvas) {
+                    new JIMP(Number(req.params.width), Number(req.params.height), parseInt(req.params.hex, 16), function(error, canvas) {
                         if (error) {
                             res.sendStatus(500);
                         } else {
