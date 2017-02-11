@@ -36,20 +36,6 @@ s3.getObject({
     }
 });
 
-setInterval(function() {
-    s3.getObject({
-    Bucket: "tranquilitytestbucket",
-    Key: "saltendpoint/auth.json"
-}, function(err, data) {
-    if (err) {
-        throw err;
-    } else if (! _.isEqual(auth, JSON.parse(data.Body.toString("utf8")))) {
-        _.forEach(auth, (v, i) => delete auth[i]);
-        _.assign(auth, JSON.parse(data.Body.toString("utf8")));
-    }
-});
-}, 600000);
-
 ftpClient.connect({
     host: process.env.FTPHOSTNAME,
     port: + process.env.FTPPORT,
