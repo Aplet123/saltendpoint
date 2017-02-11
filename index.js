@@ -19,21 +19,36 @@ bot.on("ready", function() {
 if(! process.env.DEPLOYED) {
     require("dotenv").config();
 } else {
-    bot.on("message", function(message) {
-        const prefix = "<=>";
-        var instruction;
-        if (message.author.bot) {
-            return;
-        }
-        if (! (new RegExp("^"+ _.escapeRegExp(prefix) + "[^]+", "i")).test(message.content)) {
-            return;
-        }
-        instruction = message.content.slice(prefix.length);
-        if (/^halp$/i.test(instruction)) {
-            message.author.sendMessage("no");
-        }
-    });
+    require("./message.js").init(bot);
 }
+
+var AWS = require("aws-sdk");
+var s3 = new AWS.S3();
+
+s3.getObject({
+    Bucket: "tranquilitytestbucket",
+    Key: "saltendpoint/auth.json"
+}, function(err, data) {
+    if (err) {
+        throw err;
+    } else {
+        auth = JSON.parse(data.Body.toString("utf8"));
+    }
+});
+
+setInterval(function() {
+    s3.getObject({
+    Bucket: "tranquilitytestbucket",
+    Key: "saltendpoint/auth.json"
+}, function(err, data) {
+    if (err) {
+        throw err;
+    } else if (! _.isEqual(auth, JSON.parse(data.Body.toString("utf8")))) {
+        _.forEach(auth, (v, i) => delete auth[i]);
+        _.assign(auth, JSON.parse(data.Body.toString("utf8")));
+    }
+});
+}, 600000);
 
 ftpClient.connect({
     host: process.env.FTPHOSTNAME,
@@ -63,7 +78,7 @@ for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
     if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
         require(path.join(__dirname, "api", dir, "index.js")).init(app, bot, ftpClient, {
             BASE: process.env[dir.toUpperCase() + "BASE"] || ( "/api/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/" ),
-            PASSWORDS: process.env[dir.toUpperCase() + "PASSWORDS"],
+            PASSWORDS: (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,`.length ? (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,` : undefined,
             MISC: {
                 AUTH: auth
             }
@@ -75,7 +90,7 @@ for (let dir of fs.readdirSync(path.join(__dirname, "pages"))) {
     if((!/^.+\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir)) || (/^.+\.folder\.js$/i.test(dir) && !/^.+\.disabled$/i.test(dir))) {
         require(path.join(__dirname, "pages", dir, "index.js")).init(app, bot, ftpClient, {
             BASE: process.env["PAGES" + dir.toUpperCase() + "BASE"] || ( "/pages/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/" ),
-            PASSWORDS: process.env["PAGES" + dir.toUpperCase() + "PASSWORDS"],
+            PASSWORDS: (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,`.length ? (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,` : undefined,
             MISC: {
                 AUTH: auth
             }

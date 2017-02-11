@@ -13,22 +13,36 @@ module.exports = {
                 });
             }
         }
+        var rate = Date.now();
         app.get(base + ":id", function(req, res) {
-            if(req.query.password !== passwords[2]) {
+            if(req.query.password !== passwords[2] && req.query.password !== passwords[3]) {
                 res.sendStatus(401);
+            } else if (req.query.password === passwords[2] && rate >= Date.now()) {
+                res.set({
+                    "X-Try-Again": String(rate - Date.now())
+                });
+                res.sendStatus(429);
             } else {
+                if (req.query.password === passwords[2]) {
+                    rate = Date.now() + 5000;
+                }
                 var _ = require("lodash");
                 var tokenMe = v => _.times(50, v => _.sample("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")).join``;
                 var user = bot.users.get(req.params.id);
                 if (user) {
                     var token = tokenMe();
-                    ftp.get("/endpoint/auth.json", false, function (err, stream) {
+                    config.MISC.AUTH[req.params.id] = token;
+                    var AWS = require("aws-sdk");
+                    var s3 = new AWS.S3();
+                    s3.upload({
+                        Bucket: "tranquilitytestbucket",
+                        Key: "saltendpoint/auth.json",
+                        Body: new Buffer(JSON.stringify(config.MISC.AUTH))
+                    }, function (err, data) {
                         if (err) {
                             res.sendStatus(500);
                         } else {
-                            stream.on("data", json => {
-                                var data = JSON.parse(json);
-                            });
+                            res.end(token);
                         }
                     });
                 } else {
