@@ -1,6 +1,7 @@
 module.exports = {
     init: function(app, bot, ftp, config) {
         var base = config.BASE;
+        console.log(base);
         var passwords = config.PASSWORDS || ["password", "thissupersecurepasswordisneededtodosupersecretstuff", "916154e5dadca8295894fdc961d3ca4849f84eff27edf9913c4d688adf9ea6905875b637c8966e3b4154b2d70d7fe69f5ebabc4fccd085c002625c881ac2bdf5", "I4BywAZWHSXhib2BPMjvBaQ1S.HKY.eBNqArmDS66rYgpQ6cGO"];
         var path = require("path");
         var fs = require("fs");
