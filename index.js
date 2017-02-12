@@ -1,5 +1,8 @@
 var express = require('express');
+var http = require("http");
 var app = express();
+var server = http.createServer(app);
+var io = require("socket.io")(server);
 var fs = require("fs");
 var path = require("path");
 var Discord = require("discord.js");
@@ -8,8 +11,13 @@ var _ = require("lodash");
 const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
+console.log(server.address().address);
 var bot = new Discord.Client({
     fetchAllMembers: true
+});
+
+io.on("connection", function (socket) {
+    socket.once();
 });
 
 bot.on("ready", function() {
@@ -47,6 +55,15 @@ bot.login(process.env.TOKEN);
 
 app.set('port', (process.env.PORT || 5000));
 
+app.use(function(req, res, next) {
+    if (! req.get("Host")) {
+        res.status(400);
+        res.end("PROVIDE A HOST HEADER BOI");
+    } else {
+        next();
+    }
+});
+
 app.use(express.static(__dirname + '/public'));
 
 app.set('views', __dirname + '/views');
@@ -66,7 +83,8 @@ for (let dir of fs.readdirSync(path.join(__dirname, "api"))) {
             BASE: process.env[dir.toUpperCase() + "BASE"] || ( "/api/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/" ),
             PASSWORDS: (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,`.length ? (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,` : undefined,
             MISC: {
-                AUTH: auth
+                AUTH: auth,
+                IO: io
             }
         });
     }
@@ -78,11 +96,37 @@ for (let dir of fs.readdirSync(path.join(__dirname, "pages"))) {
             BASE: process.env["PAGES" + dir.toUpperCase() + "BASE"] || ( "/pages/" + ((/^.+\.unstable$/i.test(dir)) ? "unstable/" : "") + dir.replace(/\.folder\.js$/i, ".js").replace(/\.unstable$/i, "") + "/" ),
             PASSWORDS: (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,`.length ? (process.env[dir.toUpperCase() + "PASSWORDS"] || "").split`,` : undefined,
             MISC: {
-                AUTH: auth
+                AUTH: auth,
+                IO: io
             }
         });
     }
 }
+
+app.use(function(req, res) {
+    res.status(404);
+    if (req.accepts("text/html")) {
+        res.render("pages/error", {
+            error: "Not Found",
+            status: 404,
+            url: _.escape(req.protocol + "://" + req.get("host") + req.originalUrl),
+            method: _.escape(req.method)
+        });
+    } else if (req.accepts("application/json")) {
+        res.set({
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        });
+        res.end(JSON.stringify({
+            error: "Not Found",
+            status: 404,
+            url: req.protocol + "://" + req.get("host") + req.originalUrl,
+            method: req.method
+        }));
+    } else {
+        res.end("tu madre");
+    }
+});
 
 app.listen(app.get('port'), function() {
   console.log(`Yo yo yo wazzup iz ya boi ${app.get("port")} which is pretty dank!`);

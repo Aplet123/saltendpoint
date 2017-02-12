@@ -20,7 +20,8 @@
     "lodash": "^4.17.4",
     "pug": "^2.0.0-beta11",
     "request": "^2.79.0",
-    "saltjs": "github:aplet123/saltjs"
+    "saltjs": "github:aplet123/saltjs",
+    "socket.io": "^1.7.2"
   },
   "devDependencies": {
     "dotenv": "^4.0.0"

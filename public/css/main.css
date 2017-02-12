@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css?family=Inconsolata|Open+Sans|Patua+One');
+.code {
+    font-family: "Inconsolata", monospace;
+}
+.gray {
+    border-radius: 5px;
+    background-color: #ccc;
+}
+.header {
+    font-family: "Patua One", cursive;
+}
+.plain {
+    font-family: "Open Sans", sans-serif;
+}
