@@ -11,7 +11,6 @@ var _ = require("lodash");
 const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
-console.log(server.address().address);
 var bot = new Discord.Client({
     fetchAllMembers: true
 });
