@@ -8,6 +8,10 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
+var imagePaths = require("./images.json");
+var images = {
+    discord: fs.readFileSync("files/discord.png")
+};
 const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
@@ -55,7 +59,7 @@ bot.login(process.env.TOKEN);
 app.set('port', (process.env.PORT || 5000));
 
 app.use(function(req, res, next) {
-    if (!/^[-a-zA-Z0-9_.]+(?::\d+)?$/i.test(req.get("Host"))) {
+    if (!/^[-a-zA-Z0-9_.]+(?::\d+)?$/i.test((req.get("Host") || ""))) {
         res.status(400);
         if (req.accepts("text/html")) {
             res.render("pages/error", {
@@ -84,6 +88,18 @@ app.use(function(req, res, next) {
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
             "X-Salt-Endpoint": process.env.DEPLOYED ? "Heroku" : "Cloud9"
         });
+        next();
+    }
+});
+
+app.use(function(req, res, next) {
+    if (req.get("User-Agent") === "Mozilla/5.0 (compatible; Discordbot/1.0; +https://discordapp.com)" && imagePaths.every(v => ! (new RegExp(v)).test(req.path))) {
+        res.set({
+            "Accept": "image/png",
+            "Content-Type": "image/png"
+        });
+        res.end(images.discord);
+    } else {
         next();
     }
 });
@@ -135,7 +151,7 @@ app.use(function(req, res) {
         res.render("pages/error", {
             error: "Not Found",
             status: 404,
-            url: _.escape(req.protocol + "://" + req.get("host") + req.originalUrl),
+            url: _.escape(req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl),
             method: _.escape(req.method)
         });
     } else if (req.accepts("application/json")) {
@@ -146,7 +162,7 @@ app.use(function(req, res) {
         res.end(JSON.stringify({
             error: "Not Found",
             status: 404,
-            url: req.protocol + "://" + req.get("host") + req.originalUrl,
+            url: req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl,
             method: req.method
         }));
     } else {
