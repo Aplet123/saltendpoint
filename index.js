@@ -80,7 +80,9 @@ app.use(function(req, res, next) {
         }
     } else {
         res.set({
-            "X-Powered-By": ("Express, Node.js, EJS, GitHub, and ") + (process.env.DEPLOYED ? "Heroku" : "Cloud9")
+            "X-Powered-By": ("Express, Node.js, EJS, GitHub, and ") + (process.env.DEPLOYED ? "Heroku" : "Cloud9"),
+            "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
+            "X-Salt-Endpoint": process.env.DEPLOYED ? "Heroku" : "Cloud9"
         });
         next();
     }
