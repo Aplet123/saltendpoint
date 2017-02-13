@@ -55,10 +55,33 @@ bot.login(process.env.TOKEN);
 app.set('port', (process.env.PORT || 5000));
 
 app.use(function(req, res, next) {
-    if (! req.get("Host")) {
+    if (!/[-a-zA-Z0-9_]/i.test(req.get("Host"))) {
         res.status(400);
-        res.end("PROVIDE A HOST HEADER BOI");
+        if (req.accepts("text/html")) {
+            res.render("pages/error", {
+                error: "Invalid Host Header",
+                status: 400,
+                url: _.escape(req.protocol + "://" + req.get("host") + req.originalUrl),
+                method: _.escape(req.method)
+            });
+        } else if (req.accepts("application/json")) {
+            res.set({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            });
+            res.end(JSON.stringify({
+                error: "Invalid Host Header",
+                status: 400,
+                url: req.protocol + "://" + req.get("host") + req.originalUrl,
+                method: req.method
+            }));
+        } else {
+            res.end("Invalid Host Header");
+        }
     } else {
+        res.set({
+            "X-Powered-By": ("Express, Node.js, EJS, GitHub, and ") + (process.env.DEPLOYED ? "Heroku" : "Cloud9")
+        });
         next();
     }
 });
@@ -68,6 +91,7 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.engine("html", require("express-ejs-extend"));
 app.set('view engine', 'html');
+app.disable("x-powered-by");
 
 app.get('/', function(request, response) {
   response.render('pages/index', {
