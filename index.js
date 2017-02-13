@@ -55,7 +55,7 @@ bot.login(process.env.TOKEN);
 app.set('port', (process.env.PORT || 5000));
 
 app.use(function(req, res, next) {
-    if (!/[-a-zA-Z0-9_]/i.test(req.get("Host"))) {
+    if (!/^[-a-zA-Z0-9_.]+(?::\d+)?$/i.test(req.get("Host"))) {
         res.status(400);
         if (req.accepts("text/html")) {
             res.render("pages/error", {
