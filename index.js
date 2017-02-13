@@ -124,7 +124,7 @@ app.use(function(req, res) {
             method: req.method
         }));
     } else {
-        res.end("tu madre");
+        res.end("Not Found");
     }
 });
 
