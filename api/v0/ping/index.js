@@ -16,7 +16,7 @@ module.exports = {
         app.get(base, function(req, res) {
             var request = require("request");
             var before = Date.now();
-            request((req.protocol + "://" + req.get("host") + req.path).replace(/ping$/i, "identity?value=pong"), function (error, response, body) {
+            request((req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.path).replace(/ping$/i, "identity?value=pong"), function (error, response, body) {
                 if (!error && response.statusCode === 200) {
                     res.end(String(Date.now() - before));
                 } else {
