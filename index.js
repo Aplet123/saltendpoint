@@ -8,7 +8,6 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
-var imagePaths = require("./images.json");
 var images = {
     discord: fs.readFileSync("files/discord.png")
 };
@@ -17,10 +16,6 @@ var ftpClient = new ftp();
 var auth = {};
 var bot = new Discord.Client({
     fetchAllMembers: true
-});
-
-io.on("connection", function (socket) {
-    socket.once();
 });
 
 bot.on("ready", function() {
@@ -88,44 +83,6 @@ app.use(function(req, res, next) {
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
             "X-Salt-Endpoint": process.env.DEPLOYED ? "Heroku" : "Cloud9"
         });
-        next();
-    }
-});
-
-app.use(function(req, res, next) {
-    if (req.get("User-Agent") === "Mozilla/5.0 (compatible; Discordbot/1.0; +https://discordapp.com)" && imagePaths.every(v => ! (new RegExp(v)).test(req.path))) {
-        res.set({
-            "Accept": "image/png",
-            "Content-Type": "image/png"
-        });
-        res.end(images.discord);
-    } else {
-        next();
-    }
-});
-
-app.use(function(req, res, next) {
-    if (/^\/download\/.+$/.test(req.path)) {
-        var downloadPath = req.path.replace(/^\//, "");
-        if (/\.\./.test(downloadPath)) {
-            res.sendStatus(400);
-        } else {
-            res.set({
-                "Accept": "application/octet-stream",
-                "Content-Type": "application/octet-stream"
-            });
-            var fileExists = true;
-            try {
-                fs.readFileSync(downloadPath);
-            } catch (err) {
-                fileExists = false;
-                res.sendStatus(403);
-            }
-            if (fileExists) {
-                res.end(fs.readFileSync(downloadPath));
-            }
-        }
-    } else {
         next();
     }
 });
