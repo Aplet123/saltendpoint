@@ -79,9 +79,9 @@ app.use(function(req, res, next) {
         }
     } else {
         res.set({
-            "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE,
+            "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE || "Some Random Computer",
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
-            "X-Salt-Endpoint": process.env.ENGINE
+            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer"
         });
         next();
     }
