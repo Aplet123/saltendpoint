@@ -104,6 +104,32 @@ app.use(function(req, res, next) {
     }
 });
 
+app.use(function(req, res, next) {
+    if (/^\/download\/.+$/.test(req.path)) {
+        var downloadPath = req.path.replace(/^\//, "");
+        if (/\.\./.test(downloadPath)) {
+            res.sendStatus(400);
+        } else {
+            res.set({
+                "Accept": "application/octet-stream",
+                "Content-Type": "application/octet-stream"
+            });
+            var fileExists = true;
+            try {
+                fs.readFileSync(downloadPath);
+            } catch (err) {
+                fileExists = false;
+                res.sendStatus(403);
+            }
+            if (fileExists) {
+                res.end(fs.readFileSync(downloadPath));
+            }
+        }
+    } else {
+        next();
+    }
+});
+
 app.use(express.static(__dirname + '/public'));
 
 app.set('views', __dirname + '/views');
