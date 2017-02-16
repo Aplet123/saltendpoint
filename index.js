@@ -8,9 +8,6 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
-var images = {
-    discord: fs.readFileSync("files/discord.png")
-};
 const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
@@ -60,7 +57,7 @@ app.use(function(req, res, next) {
             res.render("pages/error", {
                 error: "Invalid Host Header",
                 status: 400,
-                url: _.escape(req.protocol + "://" + req.get("host") + req.originalUrl),
+                url: _.escape(( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl),
                 method: _.escape(req.method)
             });
         } else if (req.accepts("application/json")) {
@@ -71,7 +68,7 @@ app.use(function(req, res, next) {
             res.end(JSON.stringify({
                 error: "Invalid Host Header",
                 status: 400,
-                url: req.protocol + "://" + req.get("host") + req.originalUrl,
+                url: ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
                 method: req.method
             }));
         } else {
@@ -81,7 +78,8 @@ app.use(function(req, res, next) {
         res.set({
             "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE || "Some Random Computer",
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
-            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer"
+            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer",
+            "Access-Control-Allow-Origin": "*"
         });
         next();
     }
@@ -134,7 +132,7 @@ app.use(function(req, res) {
         res.render("pages/error", {
             error: "Not Found",
             status: 404,
-            url: _.escape(req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl),
+            url: _.escape(( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl),
             method: _.escape(req.method)
         });
     } else if (req.accepts("application/json")) {
@@ -145,7 +143,7 @@ app.use(function(req, res) {
         res.end(JSON.stringify({
             error: "Not Found",
             status: 404,
-            url: req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl,
+            url: ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
             method: req.method
         }));
     } else {
