@@ -8,9 +8,6 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
-var images = {
-    discord: fs.readFileSync("files/discord.png")
-};
 const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
