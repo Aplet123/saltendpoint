@@ -8,6 +8,9 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
+var images = {
+    discord: fs.readFileSync("files/discord.png")
+};
 const { Storage } = require("saltjs");
 var ftpClient = new ftp();
 var auth = {};
@@ -39,12 +42,14 @@ s3.getObject({
     }
 });
 
+/*
 ftpClient.connect({
     host: process.env.FTPHOSTNAME,
     port: + process.env.FTPPORT,
     user: process.env.FTPUSERNAME,
     password: process.env.FTPPASSWORD
 });
+*/
 
 bot.login(process.env.TOKEN);
 
@@ -54,14 +59,10 @@ app.use(function(req, res, next) {
     if (!/^[-a-zA-Z0-9_.]+(?::\d+)?$/i.test((req.get("Host") || ""))) {
         res.status(400);
         if (req.accepts("text/html")) {
-            res.set({
-                "Accept": "text/html",
-                "Content-Type": "text/html"
-            });
             res.render("pages/error", {
                 error: "Invalid Host Header",
                 status: 400,
-                url: _.escape(( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl),
+                url: _.escape(req.protocol + "://" + req.get("host") + req.originalUrl),
                 method: _.escape(req.method)
             });
         } else if (req.accepts("application/json")) {
@@ -72,74 +73,19 @@ app.use(function(req, res, next) {
             res.end(JSON.stringify({
                 error: "Invalid Host Header",
                 status: 400,
-                url: ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
+                url: req.protocol + "://" + req.get("host") + req.originalUrl,
                 method: req.method
             }));
         } else {
-            res.set({
-                "Accept": "text/plain",
-                "Content-Type": "text/plain"
-            });
-            res.end(`400 on HTTP ${req.method} request: Invalid Host Header | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
+            res.end("Invalid Host Header");
         }
     } else {
         res.set({
             "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE || "Some Random Computer",
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
-            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer",
-            "Access-Control-Allow-Origin": "*"
+            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer"
         });
         next();
-    }
-});
-
-app.use(function(req, res, next) {
-    if (/^\/download\/.+$/.test(req.path)) {
-        var downloadPath = req.path.replace(/^\//, "");
-        if (/\.\./.test(downloadPath)) {
-            res.sendStatus(400);
-        } else {
-            res.set({
-                "Accept": "application/octet-stream",
-                "Content-Type": "application/octet-stream"
-            });
-            var fileExists = true;
-            try {
-                fs.readFileSync(downloadPath);
-            } catch (err) {
-                fileExists = false;
-                res.sendStatus(403);
-            }
-            if (fileExists) {
-                res.end(fs.readFileSync(downloadPath));
-            }
-        }
-    } else {
-        next();
-    }
-});
-
-app.use(function(req, res, next) {
-    if (/^[a-z]+\/[-a-z0-9+.]+$/.test(req.query.mime)) {
-        res.set({
-            "Accept": req.query.mime,
-            "Content-Type": req.query.mime
-        });
-    } else if (/^\/api\/.+/.test(req.path)) {
-        res.set({
-            "Accept": "text/plain",
-            "Content-Type": "text/plain"
-        });
-    } else if (/^\/pages\/.+/.test(req.path)) {
-        res.set({
-            "Accept": "text/html",
-            "Content-Type": "text/html"
-        });
-    } else {
-        res.set({
-            "Accept": "text/plain",
-            "Content-Type": "text/plain"
-        });
     }
 });
 
@@ -190,7 +136,7 @@ app.use(function(req, res) {
         res.render("pages/error", {
             error: "Not Found",
             status: 404,
-            url: _.escape(( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl),
+            url: _.escape(req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl),
             method: _.escape(req.method)
         });
     } else if (req.accepts("application/json")) {
@@ -201,11 +147,11 @@ app.use(function(req, res) {
         res.end(JSON.stringify({
             error: "Not Found",
             status: 404,
-            url: ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
+            url: req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl,
             method: req.method
         }));
     } else {
-        res.end(`404 on HTTP ${req.method} request: Not Found | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
+        res.end("Not Found");
     }
 });
 
