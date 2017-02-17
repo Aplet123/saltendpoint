@@ -54,6 +54,10 @@ app.use(function(req, res, next) {
     if (!/^[-a-zA-Z0-9_.]+(?::\d+)?$/i.test((req.get("Host") || ""))) {
         res.status(400);
         if (req.accepts("text/html")) {
+            res.set({
+                "Accept": "text/html",
+                "Content-Type": "text/html"
+            });
             res.render("pages/error", {
                 error: "Invalid Host Header",
                 status: 400,
@@ -72,7 +76,11 @@ app.use(function(req, res, next) {
                 method: req.method
             }));
         } else {
-            res.end("Invalid Host Header");
+            res.set({
+                "Accept": "text/plain",
+                "Content-Type": "text/plain"
+            });
+            res.end(`400 on HTTP ${req.method} request: Invalid Host Header | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
         }
     } else {
         res.set({
@@ -82,6 +90,56 @@ app.use(function(req, res, next) {
             "Access-Control-Allow-Origin": "*"
         });
         next();
+    }
+});
+
+app.use(function(req, res, next) {
+    if (/^\/download\/.+$/.test(req.path)) {
+        var downloadPath = req.path.replace(/^\//, "");
+        if (/\.\./.test(downloadPath)) {
+            res.sendStatus(400);
+        } else {
+            res.set({
+                "Accept": "application/octet-stream",
+                "Content-Type": "application/octet-stream"
+            });
+            var fileExists = true;
+            try {
+                fs.readFileSync(downloadPath);
+            } catch (err) {
+                fileExists = false;
+                res.sendStatus(403);
+            }
+            if (fileExists) {
+                res.end(fs.readFileSync(downloadPath));
+            }
+        }
+    } else {
+        next();
+    }
+});
+
+app.use(function(req, res, next) {
+    if (/^[a-z]+\/[-a-z0-9+.]+$/.test(req.query.mime)) {
+        res.set({
+            "Accept": req.query.mime,
+            "Content-Type": req.query.mime
+        });
+    } else if (/^\/api\/.+/.test(req.path)) {
+        res.set({
+            "Accept": "text/plain",
+            "Content-Type": "text/plain"
+        });
+    } else if (/^\/pages\/.+/.test(req.path)) {
+        res.set({
+            "Accept": "text/html",
+            "Content-Type": "text/html"
+        });
+    } else {
+        res.set({
+            "Accept": "text/plain",
+            "Content-Type": "text/plain"
+        });
     }
 });
 
@@ -147,7 +205,7 @@ app.use(function(req, res) {
             method: req.method
         }));
     } else {
-        res.end("Not Found");
+        res.end(`404 on HTTP ${req.method} request: Not Found | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
     }
 });
 
