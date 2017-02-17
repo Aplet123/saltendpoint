@@ -59,10 +59,14 @@ app.use(function(req, res, next) {
     if (!/^[-a-zA-Z0-9_.]+(?::\d+)?$/i.test((req.get("Host") || ""))) {
         res.status(400);
         if (req.accepts("text/html")) {
+            res.set({
+                "Accept": "text/html",
+                "Content-Type": "text/html"
+            });
             res.render("pages/error", {
                 error: "Invalid Host Header",
                 status: 400,
-                url: _.escape(req.protocol + "://" + req.get("host") + req.originalUrl),
+                url: _.escape(( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl),
                 method: _.escape(req.method)
             });
         } else if (req.accepts("application/json")) {
@@ -73,18 +77,75 @@ app.use(function(req, res, next) {
             res.end(JSON.stringify({
                 error: "Invalid Host Header",
                 status: 400,
-                url: req.protocol + "://" + req.get("host") + req.originalUrl,
+                url: ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
                 method: req.method
             }));
         } else {
-            res.end("Invalid Host Header");
+            res.set({
+                "Accept": "text/plain",
+                "Content-Type": "text/plain"
+            });
+            res.end(`400 on HTTP ${req.method} request: Invalid Host Header | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
         }
     } else {
         res.set({
             "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE || "Some Random Computer",
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
-            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer"
+            "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer",
+            "Access-Control-Allow-Origin": "*"
         });
+        next();
+    }
+});
+
+app.use(function(req, res, next) {
+    if (/^\/download\/.+$/.test(req.path)) {
+        var downloadPath = req.path.replace(/^\//, "");
+        if (/\.\./.test(downloadPath)) {
+            res.sendStatus(400);
+        } else {
+            res.set({
+                "Accept": "application/octet-stream",
+                "Content-Type": "application/octet-stream"
+            });
+            var fileExists = true;
+            try {
+                fs.readFileSync(downloadPath);
+            } catch (err) {
+                fileExists = false;
+                res.sendStatus(403);
+            }
+            if (fileExists) {
+                res.end(fs.readFileSync(downloadPath));
+            }
+        }
+    } else {
+        next();
+    }
+});
+
+app.use(function(req, res, next) {
+    if (/^\/download\/.+$/.test(req.path)) {
+        var downloadPath = req.path.replace(/^\//, "");
+        if (/\.\./.test(downloadPath)) {
+            res.sendStatus(400);
+        } else {
+            res.set({
+                "Accept": "application/octet-stream",
+                "Content-Type": "application/octet-stream"
+            });
+            var fileExists = true;
+            try {
+                fs.readFileSync(downloadPath);
+            } catch (err) {
+                fileExists = false;
+                res.sendStatus(403);
+            }
+            if (fileExists) {
+                res.end(fs.readFileSync(downloadPath));
+            }
+        }
+    } else {
         next();
     }
 });
