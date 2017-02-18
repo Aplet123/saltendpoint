@@ -58,3 +58,4 @@ typings/
 # Misc
 secrets/
 *.secret.*
+*.secret
