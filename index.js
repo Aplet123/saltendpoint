@@ -8,6 +8,7 @@ var path = require("path");
 var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
+var request = require("request");
 var images = {
     discord: fs.readFileSync("files/discord.png")
 };
@@ -26,6 +27,20 @@ if(! process.env.DEPLOYED) {
     require("dotenv").config();
 } else {
     require("./message.js").init(bot);
+    let requestURL;
+    setInterval(function() {
+        switch (process.env.ENGINE) {
+            case "Heroku":
+                requestURL = `https://${process.env.DEPLOY_NAME}.herokuapp.com`;
+                break;
+            case "Cloud9":
+                requestURL = `https://${process.env.DEPLOY_NAME}.c9users.io`;
+                break;
+            default:
+                requestURL = `ahsfduiasdf`
+        }
+        request(requestURL, _.noop);
+    }, 1200000);
 }
 
 var AWS = require("aws-sdk");
