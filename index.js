@@ -37,7 +37,7 @@ if(! process.env.DEPLOYED) {
                 requestURL = `https://${process.env.DEPLOY_NAME}.c9users.io`;
                 break;
             default:
-                requestURL = `ahsfduiasdf`
+                requestURL = `https://www.google.com`
         }
         request(requestURL, _.noop);
     }, 1200000);
