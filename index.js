@@ -55,15 +55,6 @@ s3.getObject({
     }
 });
 
-/*
-ftpClient.connect({
-    host: process.env.FTPHOSTNAME,
-    port: + process.env.FTPPORT,
-    user: process.env.FTPUSERNAME,
-    password: process.env.FTPPASSWORD
-});
-*/
-
 bot.login(process.env.TOKEN);
 
 app.set('port', (process.env.PORT || 5000));
@@ -105,7 +96,10 @@ app.use(function(req, res, next) {
             "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE || "Some Random Computer",
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
             "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer",
-            "Access-Control-Allow-Origin": "*"
+            "X-State": req.get("X-State") || "Unset",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Expose-Headers": "Content-Length, X-Powered-By, X-Nonce, X-Salt-Endpoint, X-State",
+            "Access-Control-Request-Headers": "Content-Type, Accept, X-Authentication, X-Misc, X-Nonce, X-Seed, X-State"
         });
         next();
     }
