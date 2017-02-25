@@ -96,7 +96,9 @@ app.use(function(req, res, next) {
             "X-Powered-By": "Express, Node.js, EJS, GitHub, and " + process.env.ENGINE || "Some Random Computer",
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
             "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer",
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Expose-Headers": "Content-Length, X-Powered-By, X-Nonce, X-Salt-Endpoint",
+            "Access-Control-Request-Headers": "Content-Type, Accept, X-Authentication, X-Misc, X-Nonce, X-Seed"
         });
         next();
     }

@@ -19,7 +19,7 @@ module.exports = {
                 res.sendStatus(401);
             } else if (req.query.password === passwords[2] && rate >= Date.now()) {
                 res.set({
-                    "X-Try-Again": String(rate - Date.now())
+                    "Retry-After": String(rate - Date.now())
                 });
                 res.sendStatus(429);
             } else {
