@@ -1,6 +1,6 @@
 {
   "name": "salt-endpoint",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A little Salt endpoint.",
   "engines": {
     "node": "7.5.0",
@@ -8,7 +8,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "echo \"I feel like it's working fine :)\""
   },
   "dependencies": {
     "aws-sdk": "^2.12.0",
@@ -25,7 +26,8 @@
     "socket.io": "^1.7.2"
   },
   "devDependencies": {
-    "dotenv": "^4.0.0"
+    "dotenv": "^4.0.0",
+    "mocha": "^3.2.0"
   },
   "repository": {
     "type": "git",

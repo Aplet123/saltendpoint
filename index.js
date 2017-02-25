@@ -1,3 +1,4 @@
+'use strict';
 var express = require('express');
 var http = require("http");
 var app = express();
@@ -9,10 +10,7 @@ var Discord = require("discord.js");
 var ftp = require("ftp");
 var _ = require("lodash");
 var request = require("request");
-var images = {
-    discord: fs.readFileSync("files/discord.png")
-};
-const { Storage } = require("saltjs");
+const Storage = require("saltjs").Storage;
 var ftpClient = new ftp();
 var auth = {};
 var bot = new Discord.Client({
@@ -37,7 +35,7 @@ if(! process.env.DEPLOYED) {
                 requestURL = `https://${process.env.DEPLOY_NAME}.c9users.io`;
                 break;
             default:
-                requestURL = `https://www.google.com`
+                requestURL = `https://www.google.com`;
         }
         request(requestURL, _.noop);
     }, 1200000);
