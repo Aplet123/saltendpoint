@@ -55,15 +55,6 @@ s3.getObject({
     }
 });
 
-/*
-ftpClient.connect({
-    host: process.env.FTPHOSTNAME,
-    port: + process.env.FTPPORT,
-    user: process.env.FTPUSERNAME,
-    password: process.env.FTPPASSWORD
-});
-*/
-
 bot.login(process.env.TOKEN);
 
 app.set('port', (process.env.PORT || 5000));
