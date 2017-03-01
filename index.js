@@ -97,8 +97,9 @@ app.use(function(req, res, next) {
             "X-Nonce": _.times(10, v => String(Math.random() * 10).replace(/\./, "")).join``,
             "X-Salt-Endpoint": process.env.ENGINE || "Some Random Computer",
             "X-State": req.get("X-State") || "Unset",
+            "X-Request-Uri": ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Expose-Headers": "Content-Length, X-Powered-By, X-Nonce, X-Salt-Endpoint, X-State",
+            "Access-Control-Expose-Headers": "Content-Length, X-Powered-By, X-Nonce, X-Salt-Endpoint, X-State, X-Request-Uri",
             "Access-Control-Request-Headers": "Content-Type, Accept, X-Authentication, X-Misc, X-Nonce, X-Seed, X-State"
         });
         next();
@@ -204,7 +205,7 @@ app.use(function(req, res) {
         res.render("pages/error", {
             error: "Not Found",
             status: 404,
-            url: _.escape(req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl),
+            url: _.escape(( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl),
             method: _.escape(req.method)
         });
     } else if (req.accepts("application/json")) {
@@ -215,7 +216,7 @@ app.use(function(req, res) {
         res.end(JSON.stringify({
             error: "Not Found",
             status: 404,
-            url: req.get("X-Forwarded-Proto") + "://" + req.get("host") + req.originalUrl,
+            url: ( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl,
             method: req.method
         }));
     } else {
