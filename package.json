@@ -8,10 +8,12 @@
   },
   "main": "index.js",
   "scripts": {
-    "prestart": "npm install -g node-gyp && node-gyp rebuild",
+    "prestart": "sh ./scripts/build.sh",
     "start": "node index.js",
     "poststart": "echo \"Started succesfully!\"",
-    "test": "echo \"I feel like it's working fine :)\""
+    "pretest": "sh ./scripts/build.sh",
+    "test": "sh ./scripts/test.sh",
+    "posttest": "echo \"I feel like it's working fine :)\""
   },
   "dependencies": {
     "aws-sdk": "^2.12.0",
