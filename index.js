@@ -220,7 +220,7 @@ app.use(function(req, res) {
             method: req.method
         }));
     } else {
-        res.end("Not Found");
+        res.end(`404 on HTTP ${req.method} request: Not Found | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
     }
 });
 
