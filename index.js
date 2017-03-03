@@ -11,6 +11,7 @@ var ftp = require("ftp");
 var _ = require("lodash");
 var request = require("request");
 const Storage = require("saltjs").Storage;
+const Random = require("bindings")("random.node");
 var ftpClient = new ftp();
 var auth = {};
 var bot = new Discord.Client({

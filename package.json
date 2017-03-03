@@ -8,11 +8,14 @@
   },
   "main": "index.js",
   "scripts": {
+    "prestart": "npm install -g node-gyp && node-gyp rebuild",
     "start": "node index.js",
+    "poststart": "echo \"Started succesfully!\"",
     "test": "echo \"I feel like it's working fine :)\""
   },
   "dependencies": {
     "aws-sdk": "^2.12.0",
+    "bindings": "^1.2.1",
     "bluebird": "^3.4.7",
     "discord.js": "^11.0.0",
     "express": "^4.14.1",
@@ -26,8 +29,7 @@
     "socket.io": "^1.7.2"
   },
   "devDependencies": {
-    "dotenv": "^4.0.0",
-    "mocha": "^3.2.0"
+    "dotenv": "^4.0.0"
   },
   "repository": {
     "type": "git",
