@@ -220,6 +220,10 @@ app.use(function(req, res) {
             method: req.method
         }));
     } else {
+        res.set({
+            "Accept": "text/plain",
+            "Content-Type": "text/plain"
+        });
         res.end(`404 on HTTP ${req.method} request: Not Found | ${( req.get("X-Forwarded-Proto") || "http") + "://" + req.get("host") + req.originalUrl}`);
     }
 });
