@@ -5,6 +5,8 @@
 #include <sstream>
 #include <cmath>
 #include <array>
+#include <typeinfo>
+#include <deque>
 
 
 namespace demo {
@@ -315,13 +317,20 @@ void Discrete (const FunctionCallbackInfo<Value>& args) {
         return;
     }
     Local <Array> arr = Local <Array>::Cast(args[0]);
-    std::array <double, arr -> Length()> weights;
-    for (long long unsigned int i = 0; i < arr -> Length(); i ++) {
-        if (! arr -> Get(current, i) -> IsNumber()) {
+    std::deque <double> weights;
+    if (arr -> Length() < weights.max_size()) {
+        weights.resize(arr -> Length());
+    } else {
+        ThrowException(isolate, "Array too long");
+        return;
+    }
+    for (unsigned int i = 0; i < arr -> Length(); i ++) {
+        Local <Value> element = arr -> Get(current, i);
+        if (! element -> IsNumber()) {
             ThrowException(isolate, "Incorrect typing");
             return;
         }
-        weights[i] = arr -> Get(current, i) -> NumberValue();
+        weights.push_back(element -> NumberValue());
     }
     generator.seed(seed);
     std::discrete_distribution <int> dist (weights.begin(), weights.end());
@@ -344,8 +353,8 @@ void init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "binomial_distribution", Binomial);
     NODE_SET_METHOD(exports, "cauchy_distribution", Cauchy);
     NODE_SET_METHOD(exports, "chi_squared_distribution", ChiSquared);
-    /*NODE_SET_METHOD(exports, "discrete_distribution", Discrete);
-    NODE_SET_METHOD(exports, "exponential_distribution", Exponential);
+    NODE_SET_METHOD(exports, "discrete_distribution", Discrete);
+    /*NODE_SET_METHOD(exports, "exponential_distribution", Exponential);
     NODE_SET_METHOD(exports, "extreme_value_distribution", ExtremeValue);
     NODE_SET_METHOD(exports, "fisher_f_distribution", FisherF);
     NODE_SET_METHOD(exports, "gamma_distribution", Gamma);
