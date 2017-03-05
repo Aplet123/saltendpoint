@@ -318,14 +318,17 @@ void Discrete (const FunctionCallbackInfo<Value>& args) {
     }
     Local <Array> arr = Local <Array>::Cast(args[0]);
     std::deque <double> weights;
-    if (arr -> Length() < weights.max_size()) {
-        weights.resize(arr -> Length());
-    } else {
+    if (arr -> Length() > weights.max_size()) {
         ThrowException(isolate, "Array too long");
         return;
     }
     for (unsigned int i = 0; i < arr -> Length(); i ++) {
-        Local <Value> element = arr -> Get(current, i);
+        Local <Value> element;
+        if (arr -> Get(current, i).IsEmpty()) {
+            ThrowException(isolate, "Cannot convert to local");
+            return;
+        }
+        element = arr -> Get(current, i).ToLocalChecked();
         if (! element -> IsNumber()) {
             ThrowException(isolate, "Incorrect typing");
             return;
