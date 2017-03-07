@@ -7,6 +7,7 @@
 #include <array>
 #include <typeinfo>
 #include <deque>
+#include <cstdlib>
 
 
 namespace demo {
@@ -885,11 +886,11 @@ void PiecewiseConstant (const FunctionCallbackInfo<Value>& args) {
     }
     for (unsigned int i = 0; i < arr0 -> Length(); i ++) {
         Local <Value> element;
-        if (arr -> Get(current, i).IsEmpty()) {
+        if (arr0 -> Get(current, i).IsEmpty()) {
             ThrowException(isolate, "Cannot convert to local");
             return;
         }
-        element = arr -> Get(current, i).ToLocalChecked();
+        element = arr0 -> Get(current, i).ToLocalChecked();
         if (! element -> IsNumber()) {
             ThrowException(isolate, "Incorrect typing");
             return;
@@ -979,11 +980,11 @@ void PiecewiseLinear (const FunctionCallbackInfo<Value>& args) {
     }
     for (unsigned int i = 0; i < arr0 -> Length(); i ++) {
         Local <Value> element;
-        if (arr -> Get(current, i).IsEmpty()) {
+        if (arr0 -> Get(current, i).IsEmpty()) {
             ThrowException(isolate, "Cannot convert to local");
             return;
         }
-        element = arr -> Get(current, i).ToLocalChecked();
+        element = arr0 -> Get(current, i).ToLocalChecked();
         if (! element -> IsNumber()) {
             ThrowException(isolate, "Incorrect typing");
             return;
@@ -992,6 +993,299 @@ void PiecewiseLinear (const FunctionCallbackInfo<Value>& args) {
     }
     generator.seed(seed);
     std::piecewise_linear_distribution <double> dist (weights.begin(), weights.end(), weights0.begin());
+    if (seqLength > 0) {
+        Local <Context> current = isolate -> GetCurrentContext();
+        Local <Array> ret = Array::New(isolate, seqLength);
+        for (int i = 0; i < seqLength; i ++) {
+            ret -> Set(current, i, Number::New(isolate, dist(generator)));
+        }
+        args.GetReturnValue().Set(ret);
+    } else {
+        Local <Number> ret = Number::New(isolate, dist(generator));
+        args.GetReturnValue().Set(ret);
+    }
+}
+
+void Poisson(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    int argLength = args.Length();
+    double seed = high_resolution_clock::now().time_since_epoch().count();
+    int seqLength = 0;
+    int needLength = 1;
+    int optionalLength = 0;
+    if (argLength < needLength) {
+            ThrowException(isolate, "Too few arguments");
+            return;
+    } else if (argLength > needLength + optionalLength + 2) {
+        ThrowException(isolate, "Too many arguments");
+        return;
+    } else if (argLength == needLength + optionalLength + 1) {
+        if (! args[needLength + optionalLength] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+        }
+    } else if (argLength == needLength + optionalLength + 2) {
+        if (! ( args[needLength + optionalLength] -> IsNumber() || args[needLength + optionalLength + 1] -> IsNumber())) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+            seqLength = args[needLength + optionalLength + 1] -> NumberValue();
+        }
+    }
+    std::minstd_rand0 generator;
+    for (int i = 0; i < needLength + optionalLength; i ++) {
+        if (! args[i] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        }
+    }
+    double doub1 = args[0] -> NumberValue();
+    generator.seed(seed);
+    std::poisson_distribution <int> dist(doub1);
+    if (seqLength > 0) {
+        Local <Context> current = isolate -> GetCurrentContext();
+        Local <Array> ret = Array::New(isolate, seqLength);
+        for (int i = 0; i < seqLength; i ++) {
+            ret -> Set(current, i, Number::New(isolate, dist(generator)));
+        }
+        args.GetReturnValue().Set(ret);
+    } else {
+        Local <Number> ret = Number::New(isolate, dist(generator));
+        args.GetReturnValue().Set(ret);
+    }
+}
+
+void StudentT(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    int argLength = args.Length();
+    double seed = high_resolution_clock::now().time_since_epoch().count();
+    int seqLength = 0;
+    int needLength = 1;
+    int optionalLength = 0;
+    if (argLength < needLength) {
+            ThrowException(isolate, "Too few arguments");
+            return;
+    } else if (argLength > needLength + optionalLength + 2) {
+        ThrowException(isolate, "Too many arguments");
+        return;
+    } else if (argLength == needLength + optionalLength + 1) {
+        if (! args[needLength + optionalLength] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+        }
+    } else if (argLength == needLength + optionalLength + 2) {
+        if (! ( args[needLength + optionalLength] -> IsNumber() || args[needLength + optionalLength + 1] -> IsNumber())) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+            seqLength = args[needLength + optionalLength + 1] -> NumberValue();
+        }
+    }
+    std::minstd_rand0 generator;
+    for (int i = 0; i < needLength + optionalLength; i ++) {
+        if (! args[i] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        }
+    }
+    double doub1 = args[0] -> NumberValue();
+    generator.seed(seed);
+    std::student_t_distribution <double> dist(doub1);
+    if (seqLength > 0) {
+        Local <Context> current = isolate -> GetCurrentContext();
+        Local <Array> ret = Array::New(isolate, seqLength);
+        for (int i = 0; i < seqLength; i ++) {
+            ret -> Set(current, i, Number::New(isolate, dist(generator)));
+        }
+        args.GetReturnValue().Set(ret);
+    } else {
+        Local <Number> ret = Number::New(isolate, dist(generator));
+        args.GetReturnValue().Set(ret);
+    }
+}
+
+void UniformInt(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    int argLength = args.Length();
+    double seed = high_resolution_clock::now().time_since_epoch().count();
+    int seqLength = 0;
+    int needLength = 2;
+    int optionalLength = 0;
+    if (argLength < needLength) {
+            ThrowException(isolate, "Too few arguments");
+            return;
+    } else if (argLength > needLength + optionalLength + 2) {
+        ThrowException(isolate, "Too many arguments");
+        return;
+    } else if (argLength == needLength + optionalLength + 1) {
+        if (! args[needLength + optionalLength] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+        }
+    } else if (argLength == needLength + optionalLength + 2) {
+        if (! ( args[needLength + optionalLength] -> IsNumber() || args[needLength + optionalLength + 1] -> IsNumber())) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+            seqLength = args[needLength + optionalLength + 1] -> NumberValue();
+        }
+    }
+    std::minstd_rand0 generator;
+    for (int i = 0; i < needLength + optionalLength; i ++) {
+        if (! args[i] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        }
+    }
+    double doub1 = args[0] -> NumberValue();
+    double doub2 = args[1] -> NumberValue();
+    generator.seed(seed);
+    std::uniform_int_distribution <int> dist(doub1, doub2);
+    if (seqLength > 0) {
+        Local <Context> current = isolate -> GetCurrentContext();
+        Local <Array> ret = Array::New(isolate, seqLength);
+        for (int i = 0; i < seqLength; i ++) {
+            ret -> Set(current, i, Number::New(isolate, dist(generator)));
+        }
+        args.GetReturnValue().Set(ret);
+    } else {
+        Local <Number> ret = Number::New(isolate, dist(generator));
+        args.GetReturnValue().Set(ret);
+    }
+}
+
+void UniformReal(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    int argLength = args.Length();
+    double seed = high_resolution_clock::now().time_since_epoch().count();
+    int seqLength = 0;
+    int needLength = 2;
+    int optionalLength = 0;
+    if (argLength < needLength) {
+            ThrowException(isolate, "Too few arguments");
+            return;
+    } else if (argLength > needLength + optionalLength + 2) {
+        ThrowException(isolate, "Too many arguments");
+        return;
+    } else if (argLength == needLength + optionalLength + 1) {
+        if (! args[needLength + optionalLength] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+        }
+    } else if (argLength == needLength + optionalLength + 2) {
+        if (! ( args[needLength + optionalLength] -> IsNumber() || args[needLength + optionalLength + 1] -> IsNumber())) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+            seqLength = args[needLength + optionalLength + 1] -> NumberValue();
+        }
+    }
+    std::minstd_rand0 generator;
+    for (int i = 0; i < needLength + optionalLength; i ++) {
+        if (! args[i] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        }
+    }
+    double doub1 = args[0] -> NumberValue();
+    double doub2 = args[1] -> NumberValue();
+    generator.seed(seed);
+    std::uniform_real_distribution <double> dist(doub1, doub2);
+    if (seqLength > 0) {
+        Local <Context> current = isolate -> GetCurrentContext();
+        Local <Array> ret = Array::New(isolate, seqLength);
+        for (int i = 0; i < seqLength; i ++) {
+            ret -> Set(current, i, Number::New(isolate, dist(generator)));
+        }
+        args.GetReturnValue().Set(ret);
+    } else {
+        Local <Number> ret = Number::New(isolate, dist(generator));
+        args.GetReturnValue().Set(ret);
+    }
+}
+
+void Weibull(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    int argLength = args.Length();
+    double seed = high_resolution_clock::now().time_since_epoch().count();
+    int seqLength = 0;
+    int needLength = 2;
+    int optionalLength = 0;
+    if (argLength < needLength) {
+            ThrowException(isolate, "Too few arguments");
+            return;
+    } else if (argLength > needLength + optionalLength + 2) {
+        ThrowException(isolate, "Too many arguments");
+        return;
+    } else if (argLength == needLength + optionalLength + 1) {
+        if (! args[needLength + optionalLength] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+        }
+    } else if (argLength == needLength + optionalLength + 2) {
+        if (! ( args[needLength + optionalLength] -> IsNumber() || args[needLength + optionalLength + 1] -> IsNumber())) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        } else {
+            seed = args[needLength + optionalLength] -> NumberValue();
+            if (seed == 0) {
+                seed = high_resolution_clock::now().time_since_epoch().count();
+            }
+            seqLength = args[needLength + optionalLength + 1] -> NumberValue();
+        }
+    }
+    std::minstd_rand0 generator;
+    for (int i = 0; i < needLength + optionalLength; i ++) {
+        if (! args[i] -> IsNumber()) {
+            ThrowException(isolate, "Incorrect typing");
+            return;
+        }
+    }
+    double doub1 = args[0] -> NumberValue();
+    double doub2 = args[1] -> NumberValue();
+    generator.seed(seed);
+    std::weibull_distribution <double> dist(doub1, doub2);
     if (seqLength > 0) {
         Local <Context> current = isolate -> GetCurrentContext();
         Local <Array> ret = Array::New(isolate, seqLength);
@@ -1023,11 +1317,11 @@ void init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "gaussian_distribution", Normal);
     NODE_SET_METHOD(exports, "piecewise_constant_distribution", PiecewiseConstant);
     NODE_SET_METHOD(exports, "piecewise_linear_distribution", PiecewiseLinear);
-    /*NODE_SET_METHOD(exports, "poisson_distribution", Poisson);
+    NODE_SET_METHOD(exports, "poisson_distribution", Poisson);
     NODE_SET_METHOD(exports, "student_t_distribution", StudentT);
     NODE_SET_METHOD(exports, "uniform_int_distribution", UniformInt);
     NODE_SET_METHOD(exports, "uniform_real_distribution", UniformReal);
-    NODE_SET_METHOD(exports, "weibull_distribution", Weibull);*/
+    NODE_SET_METHOD(exports, "weibull_distribution", Weibull);
 }
 
 NODE_MODULE(random, init)
