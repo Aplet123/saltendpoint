@@ -8,6 +8,7 @@
 #include <typeinfo>
 #include <deque>
 #include <cstdlib>
+#include <iterator>
 
 
 namespace demo {
@@ -29,6 +30,20 @@ using std::cin;
 using std::endl;
 using std::chrono::high_resolution_clock;
 using std::stringstream;
+
+template <class T>
+
+class ArrayIterator : public std::iterator <std::input_iterator_tag, T> {
+    T * p;
+public:
+    ArrayIterator(T* x) : p(x) {}
+    ArrayIterator(const ArrayIterator& mit) : p(mit.p) {}
+    ArrayIterator& operator++() { ++ p; return *this; }
+    ArrayIterator operator++(int) { ArrayIterator tmp(*this); operator++(); return tmp; }
+    bool operator==(const ArrayIterator& rhs) { return p == rhs.p; }
+    bool operator!=(const ArrayIterator& rhs) { return p != rhs.p; }
+    T& operator*() { return *p; }
+};
 
 void ThrowException(Isolate* isolate, const char * exception) {
     isolate -> ThrowException(Exception::Error(String::NewFromUtf8(isolate, exception)));
@@ -315,11 +330,7 @@ void Discrete (const FunctionCallbackInfo<Value>& args) {
         return;
     }
     Local <Array> arr = Local <Array>::Cast(args[0]);
-    std::deque <double> weights;
-    if (arr -> Length() > weights.max_size()) {
-        ThrowException(isolate, "Array too long");
-        return;
-    }
+    double * weights = ( double * ) malloc(arr -> Length() * sizeof(double));
     for (unsigned int i = 0; i < arr -> Length(); i ++) {
         Local <Value> element;
         if (arr -> Get(current, i).IsEmpty()) {
@@ -331,10 +342,12 @@ void Discrete (const FunctionCallbackInfo<Value>& args) {
             ThrowException(isolate, "Incorrect typing");
             return;
         }
-        weights.push_back(element -> NumberValue());
+        weights[i] = element -> NumberValue();
     }
     generator.seed(seed);
-    std::discrete_distribution <int> dist (weights.begin(), weights.end());
+    ArrayIterator <double> begin = weights;
+    ArrayIterator <double> end = weights + arr -> Length();
+    std::discrete_distribution <int> dist (begin, end);
     if (seqLength > 0) {
         Local <Context> current = isolate -> GetCurrentContext();
         Local <Array> ret = Array::New(isolate, seqLength);
@@ -346,6 +359,7 @@ void Discrete (const FunctionCallbackInfo<Value>& args) {
         Local <Number> ret = Number::New(isolate, dist(generator));
         args.GetReturnValue().Set(ret);
     }
+    free(weights);
 }
 
 void Exponential(const FunctionCallbackInfo<Value>& args) {
