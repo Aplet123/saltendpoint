@@ -879,12 +879,8 @@ void PiecewiseConstant (const FunctionCallbackInfo<Value>& args) {
         ThrowException(isolate, "Lengths are mismatched");
         return;
     }
-    std::deque <double> weights;
-    std::deque <double> weights0;
-    if (arr0 -> Length() > weights.max_size()) {
-        ThrowException(isolate, "Array too long");
-        return;
-    }
+    double * weights = ( double * ) malloc(arr -> Length() * sizeof(double));
+    double * weights0 = ( double * ) malloc(arr0 -> Length() * sizeof(double));
     for (unsigned int i = 0; i < arr -> Length(); i ++) {
         Local <Value> element;
         if (arr -> Get(current, i).IsEmpty()) {
@@ -896,7 +892,7 @@ void PiecewiseConstant (const FunctionCallbackInfo<Value>& args) {
             ThrowException(isolate, "Incorrect typing");
             return;
         }
-        weights.push_back(element -> NumberValue());
+        weights[i] = element -> NumberValue();
     }
     for (unsigned int i = 0; i < arr0 -> Length(); i ++) {
         Local <Value> element;
@@ -909,10 +905,13 @@ void PiecewiseConstant (const FunctionCallbackInfo<Value>& args) {
             ThrowException(isolate, "Incorrect typing");
             return;
         }
-        weights0.push_back(element -> NumberValue());
+        weights0[i] = element -> NumberValue();
     }
     generator.seed(seed);
-    std::piecewise_constant_distribution <double> dist (weights.begin(), weights.end(), weights0.begin());
+    ArrayIterator <double> begin = weights;
+    ArrayIterator <double> begin0 = weights0;
+    ArrayIterator <double> end = weights + arr -> Length();
+    std::piecewise_constant_distribution <double> dist (begin, end, begin0);
     if (seqLength > 0) {
         Local <Context> current = isolate -> GetCurrentContext();
         Local <Array> ret = Array::New(isolate, seqLength);
@@ -973,12 +972,8 @@ void PiecewiseLinear (const FunctionCallbackInfo<Value>& args) {
         ThrowException(isolate, "Lengths are mismatched");
         return;
     }
-    std::deque <double> weights;
-    std::deque <double> weights0;
-    if (arr -> Length() > weights.max_size()) {
-        ThrowException(isolate, "Array too long");
-        return;
-    }
+    double * weights = ( double * ) malloc(arr -> Length() * sizeof(double));
+    double * weights0 = ( double * ) malloc(arr0 -> Length() * sizeof(double));
     for (unsigned int i = 0; i < arr -> Length(); i ++) {
         Local <Value> element;
         if (arr -> Get(current, i).IsEmpty()) {
@@ -990,7 +985,7 @@ void PiecewiseLinear (const FunctionCallbackInfo<Value>& args) {
             ThrowException(isolate, "Incorrect typing");
             return;
         }
-        weights.push_back(element -> NumberValue());
+        weights[i] = element -> NumberValue();
     }
     for (unsigned int i = 0; i < arr0 -> Length(); i ++) {
         Local <Value> element;
@@ -1003,10 +998,13 @@ void PiecewiseLinear (const FunctionCallbackInfo<Value>& args) {
             ThrowException(isolate, "Incorrect typing");
             return;
         }
-        weights0.push_back(element -> NumberValue());
+        weights0[i] = element -> NumberValue();
     }
     generator.seed(seed);
-    std::piecewise_linear_distribution <double> dist (weights.begin(), weights.end(), weights0.begin());
+    ArrayIterator <double> begin = weights;
+    ArrayIterator <double> begin0 = weights0;
+    ArrayIterator <double> end = weights + arr -> Length();
+    std::piecewise_linear_distribution <double> dist (begin, end, begin0);
     if (seqLength > 0) {
         Local <Context> current = isolate -> GetCurrentContext();
         Local <Array> ret = Array::New(isolate, seqLength);
