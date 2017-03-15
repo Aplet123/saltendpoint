@@ -29,10 +29,14 @@
     "pug": "^2.0.0-beta11",
     "request": "^2.79.0",
     "saltjs": "github:aplet123/saltjs",
+<<<<<<< HEAD
     "socket.io": "^1.7.2",
     "utf-8-validate": "^3.0.1",
     "ws": "^2.2.1",
     "xml2js": "^0.4.17"
+=======
+    "socket.io": "^1.7.2"
+>>>>>>> parent of d28be9f... Some shizzle
   },
   "devDependencies": {
     "dotenv": "^4.0.0"
