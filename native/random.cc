@@ -11,7 +11,7 @@
 #include <iterator>
 
 
-namespace demo {
+namespace random {
 
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
