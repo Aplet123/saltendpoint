@@ -9,7 +9,8 @@
 #include <deque>
 #include <cstdlib>
 #include <iterator>
-
+#include <string>
+#include <new>
 
 namespace namerandom {
 
@@ -30,6 +31,16 @@ using std::cin;
 using std::endl;
 using std::chrono::high_resolution_clock;
 using std::stringstream;
+
+template <int w, int h, class T>
+
+class Matrix {
+    int ** arr;
+public:
+    Matrix() {
+        
+    }
+}
 
 template <class T>
 
